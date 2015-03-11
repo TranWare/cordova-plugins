@@ -5,11 +5,14 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.os.Handler;
 import android.util.Log;
 
 public class TestPlugin extends CordovaPlugin {
 	public static final String TAG = TestPlugin.class.getSimpleName();
 	public static final String ACTION_FNORD = "fnord";
+	// MagTek example has a handler initialized like this
+	private final Handler handler = new Handler();
 	private boolean awesome;
 	
 	{
@@ -25,30 +28,20 @@ public class TestPlugin extends CordovaPlugin {
 		if(ACTION_FNORD.equals(action)) {
 			awesome = !awesome;
 			if(awesome) {
-				cordova.getThreadPool().execute(new Runnable() {
+				handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						try {
-							Thread.sleep(3000);
-						} catch (InterruptedException e) {
-							// ignore
-						}
 						callback.success("A WINNER IS YOU!");						
 					}
-				});
+				}, 3000);
 			}
 			else {
-				cordova.getThreadPool().execute(new Runnable() {
+				handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						try {
-							Thread.sleep(3000);
-						} catch (InterruptedException e) {
-							// ignore
-						}
-						callback.error("epic fail");						
+						callback.error("epic fail");				
 					}
-				});
+				}, 3000);
 			}
 		}
 		

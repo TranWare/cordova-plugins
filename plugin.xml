@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="com.tranware.cordova.TestPlugin" version="0.0.3" xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="com.tranware.cordova.TestPlugin" version="0.0.4" xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>IDTech UniPay Card Reader</name>
     <description>Allow using the IDTech UniPay Card Reader with PhoneGap apps</description>
     <author email="kkrumweide@universaltranware.com" href="http://www.tranware.com">Universal Tranware,LLC</author>

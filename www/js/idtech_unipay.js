@@ -8,9 +8,10 @@
  
         IDTech.fnord = function(callback, error) {
         $('.error').html('Making cordova.exec call to fnord', []);
-        var success = function(connected) {
-            callback(connected);
-        };
+        var success = function(fnord) {
+           	$("#result").html(fnord);
+               callback(fnord);
+           };
         var fail_handler = error || fail;
 
         cordova.exec(success, fail_handler, 'com.tranware.UniPay', 'fnord', []);

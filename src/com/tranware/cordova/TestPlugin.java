@@ -18,17 +18,37 @@ public class TestPlugin extends CordovaPlugin {
 
 	@Override
 	public boolean execute(String action, JSONArray args,
-			CallbackContext callback) throws JSONException {
+			final CallbackContext callback) throws JSONException {
 
 		Log.d(TAG, "execute called in " + Thread.currentThread().getName());
 		
 		if(ACTION_FNORD.equals(action)) {
 			awesome = !awesome;
 			if(awesome) {
-				callback.success("A WINNER IS YOU!");
+				cordova.getThreadPool().execute(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(3000);
+						} catch (InterruptedException e) {
+							// ignore
+						}
+						callback.success("A WINNER IS YOU!");						
+					}
+				});
 			}
 			else {
-				callback.error("epic fail");
+				cordova.getThreadPool().execute(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(3000);
+						} catch (InterruptedException e) {
+							// ignore
+						}
+						callback.error("epic fail");						
+					}
+				});
 			}
 		}
 		

@@ -50,6 +50,7 @@ public class TestPlugin extends CordovaPlugin {
 					Log.w(TAG, "runnable not posted");
 				}
 			}
+			return true;
 		}
 		
 		return false;

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="com.tranware.cordova.TestPlugin" version="0.0.1" xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>IDTech UniPay Card Reader</name>
+    <description>Allow using the IDTech UniPay Card Reader with PhoneGap apps</description>
+    <author email="kkrumweide@universaltranware.com" href="http://www.tranware.com">Universal Tranware,LLC</author>
+    <license>Apache 2.0</license>
+    
+    <keywords>IDTech, UniPay, card reader, credit card, reader</keywords>
+
+    <engines>
+        <engine name="cordova" version=">3.0.0" />
+    </engines>
+
+    <platform name="android">    
+        <config-file target="config.xml" parent="/*">
+            <feature name="com.tranware.UniPay">
+                <param name="android-package" value="com.tranware.cordova.TestPlugin" />
+            </feature>
+        </config-file>
+        
+        <js-module src="www/js/idtech_unipay.js" name="IDTech">
+            <clobbers target="cordova.plugins.IDTech" />
+        </js-module>
+
+        <source-file src="src/android/com/tranware/cordova/TestPlugin/IDTUniPaySDK.jar" target-dir="libs" />
+        <source-file src="src/android/com/tranware/cordova/TestPlugin/MagTekUDynamoPlugin.java" target-dir="src/com/tranware/cordova/TestPlugin" />
+    </platform>
+</plugin>

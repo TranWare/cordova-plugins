@@ -24,24 +24,31 @@ public class TestPlugin extends CordovaPlugin {
 			final CallbackContext callback) throws JSONException {
 
 		Log.d(TAG, "execute called in " + Thread.currentThread().getName());
+		Log.d(TAG, "action: " + action);
 		
-		if(ACTION_FNORD.equals(action)) {
+		if(ACTION_FNORD.equals(action)) {			
 			awesome = !awesome;
 			if(awesome) {
-				handler.postDelayed(new Runnable() {
+				boolean posted = handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
 						callback.success("A WINNER IS YOU!");						
 					}
 				}, 3000);
+				if(!posted) {
+					Log.w(TAG, "runnable not posted");
+				}
 			}
 			else {
-				handler.postDelayed(new Runnable() {
+				boolean posted = handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
 						callback.error("epic fail");				
 					}
 				}, 3000);
+				if(!posted) {
+					Log.w(TAG, "runnable not posted");
+				}
 			}
 		}
 		

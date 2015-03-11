@@ -23,6 +23,6 @@
         </js-module>
 
         <source-file src="src/android/com/tranware/cordova/TestPlugin/IDTUniPaySDK.jar" target-dir="libs" />
-        <source-file src="src/android/com/tranware/cordova/TestPlugin/MagTekUDynamoPlugin.java" target-dir="src/com/tranware/cordova/TestPlugin" />
+        <source-file src="src/android/com/tranware/cordova/TestPlugin.java" target-dir="src/com/tranware/cordova/TestPlugin" />
     </platform>
 </plugin>

@@ -26,30 +26,37 @@ public class TestPlugin extends CordovaPlugin {
 		Log.d(TAG, "execute called in " + Thread.currentThread().getName());
 		Log.d(TAG, "action: " + action);
 		
-		if(ACTION_FNORD.equals(action)) {			
-			awesome = !awesome;
-			if(awesome) {
-				boolean posted = handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						callback.success("A WINNER IS YOU!");						
-					}
-				}, 3000);
-				if(!posted) {
-					Log.w(TAG, "runnable not posted");
-				}
-			}
-			else {
-				boolean posted = handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						callback.error("epic fail");				
-					}
-				}, 3000);
-				if(!posted) {
-					Log.w(TAG, "runnable not posted");
-				}
-			}
+		if(ACTION_FNORD.equals(action)) {
+			
+			JSONArray result = new JSONArray();
+			result.put("abc");
+			result.put("0123456789");
+			result.put("we all live in a yellow submarine");
+			
+			
+//			awesome = !awesome;
+//			if(awesome) {
+//				boolean posted = handler.postDelayed(new Runnable() {
+//					@Override
+//					public void run() {
+//						callback.success("A WINNER IS YOU!");						
+//					}
+//				}, 3000);
+//				if(!posted) {
+//					Log.w(TAG, "runnable not posted");
+//				}
+//			}
+//			else {
+//				boolean posted = handler.postDelayed(new Runnable() {
+//					@Override
+//					public void run() {
+//						callback.error("epic fail");				
+//					}
+//				}, 3000);
+//				if(!posted) {
+//					Log.w(TAG, "runnable not posted");
+//				}
+//			}
 			return true;
 		}
 		

@@ -31,6 +31,7 @@ public class UniPayPlugin extends CordovaPlugin {
 	private static final String ACTION_CANCEL_SWIPE = "cancelSwipe";
 	private static final String ACTION_DISABLE_READER = "disableReader";
 	
+	private static final String ERROR_NOT_DETECTED = "notDetected";
 	private static final String ERROR_CANCEL = "cancel";	
 	private static final String ERROR_TIMEOUT = "timeout";
 	private static final String ERROR_NO_TRACK2 = "noTrack2";
@@ -39,9 +40,9 @@ public class UniPayPlugin extends CordovaPlugin {
 	/* Can't initialize this at construction because it needs a Context from
 	 * cordova.getActivity(), and cordova won't have been initialized yet.
 	 */ 
-	private UniPayReader mReader;
-	
-	private CallbackContext mCordovaCallback;	
+	private UniPayReader mReader;	
+	private CallbackContext mCordovaCallback;
+	private boolean mSwiping;
 
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -68,6 +69,7 @@ public class UniPayPlugin extends CordovaPlugin {
 		}
 		else if(ACTION_GET_SWIPE.equals(action)) {
 			mCordovaCallback = callback;
+			mSwiping = true;
 			mReader.startSwipeCard();
 			// callback occurs when swipe is received or times out
 			return true;
@@ -78,6 +80,7 @@ public class UniPayPlugin extends CordovaPlugin {
 			 * UniPayReader#sendCommandCancelSwipingMSRCard().
 			 */
 			mReader.stopSwipeCard();
+			mSwiping = false;
 			// no callback, but send error to original swipe callback
 			mCordovaCallback.error(ERROR_CANCEL);
 			mCordovaCallback = null;
@@ -197,6 +200,7 @@ public class UniPayPlugin extends CordovaPlugin {
 
 		@Override
 		public void onReceiveMsgCardData(byte flags, byte[] data) {
+			mSwiping = false;
 			if(flags == 0) {
 				Log.d(TAG, "received swipe");
 				final String trackData = new String(data);				
@@ -229,10 +233,21 @@ public class UniPayPlugin extends CordovaPlugin {
 
 		@Override
 		public void onReceiveMsgTimeout(String message) {
-			// including this in case they ever fix it
-			Log.d(TAG, "swipe timed out");
-			mCordovaCallback.error(ERROR_TIMEOUT);
-			mCordovaCallback = null;
+			/* This is not actually called for a swipe timeout, only for
+			 * failure to enable the device.  Including this logic in case
+			 * they ever fix it. 
+			 */
+			if(mSwiping) {
+				Log.d(TAG, "swipe timed out");
+				mCordovaCallback.error(ERROR_TIMEOUT);
+				mCordovaCallback = null;
+				mSwiping = false;
+			}
+			else {
+				Log.d(TAG, "no response from reader");
+				mCordovaCallback.error(ERROR_NOT_DETECTED);
+				mCordovaCallback = null;				
+			}
 		}
 	}	
 }

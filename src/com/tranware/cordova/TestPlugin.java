@@ -32,7 +32,7 @@ public class TestPlugin extends CordovaPlugin {
 			result.put("abc");
 			result.put("0123456789");
 			result.put("we all live in a yellow submarine");
-			
+			callback.success(result);
 			
 //			awesome = !awesome;
 //			if(awesome) {
@@ -57,6 +57,7 @@ public class TestPlugin extends CordovaPlugin {
 //					Log.w(TAG, "runnable not posted");
 //				}
 //			}
+			
 			return true;
 		}
 		

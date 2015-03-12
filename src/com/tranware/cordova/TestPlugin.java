@@ -4,6 +4,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.Handler;
 import android.util.Log;
@@ -28,10 +29,10 @@ public class TestPlugin extends CordovaPlugin {
 		
 		if(ACTION_FNORD.equals(action)) {
 			
-			JSONArray result = new JSONArray();
-			result.put("abc");
-			result.put("0123456789");
-			result.put("we all live in a yellow submarine");
+			JSONObject result = new JSONObject();
+			result.put("card", "0123456789");
+			result.put("exp", "1234");
+			result.put("raw", "we all live in a yellow submarine");
 			callback.success(result);
 			
 //			awesome = !awesome;

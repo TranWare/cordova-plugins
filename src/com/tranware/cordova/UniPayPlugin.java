@@ -59,11 +59,13 @@ public class UniPayPlugin extends CordovaPlugin {
 			mCordovaCallback = callback;
 			mReader.sendCommandEnableSwipingMSRCard();
 			// callback occurs when command result is received
+			return true;
 		}
 		else if(ACTION_GET_SWIPE.equals(action)) {
 			mCordovaCallback = callback;
 			mReader.startSwipeCard();
 			// callback occurs when swipe is received or times out
+			return true;
 		}
 		else if(ACTION_CANCEL_SWIPE.equals(action)) {
 			/* Docs are ambiguous, but I think this is the correct method to
@@ -74,11 +76,13 @@ public class UniPayPlugin extends CordovaPlugin {
 			// no callback, but send error to original swipe callback
 			mCordovaCallback.error(ERROR_CANCEL);
 			mCordovaCallback = null;
+			return true;
 		}
 		else if(ACTION_DISABLE_READER.equals(action)) {
 			mReader.sendCommandCancelSwipingMSRCard();
 			callback.success();
 			mCordovaCallback = null;
+			return true;
 		}
 		
 		return false;

@@ -1,7 +1,9 @@
 package com.tranware.cordova;
 
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,27 +43,23 @@ public class UniPayPlugin extends CordovaPlugin {
 	
 	private CallbackContext mCordovaCallback;	
 
-	// Lifecycle methods never get called because Cordova is awesome.
 	@Override
-	public void onResume(boolean multitasking) {
+	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+		Log.d(TAG, "initialize");
+		super.initialize(cordova, webView);
 		initReader();
 		mReader.registerListen();
 	}
-
+	
 	@Override
-	public void onPause(boolean multitasking) {
+	public void onDestroy() {
+		Log.d(TAG, "onDestroy");
 		mReader.unregisterListen();
 		mReader = null;
 	}
-	
+
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callback) throws JSONException {
-		// Hack to work around lifecycle methods not being called.
-		// Not sure what we're going to do about cleanup.
-		if(mReader == null) {
-			initReader();
-		}
-		
 		if(ACTION_ENABLE_READER.equals(action)) {
 			mCordovaCallback = callback;
 			mReader.sendCommandEnableSwipingMSRCard();

@@ -1,7 +1,7 @@
  'use strict';
  
     var IDTech = ( typeof IDTech === 'undefined' ? {} : IDTech );
-    var cordova = window.cordova || window.Cordova,
+    var cordova = window.cordova || window.Cordova;
     
     IDTech.enable = function(callback, error) {
         var success = function(data) {

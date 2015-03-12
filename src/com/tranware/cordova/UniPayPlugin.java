@@ -41,6 +41,7 @@ public class UniPayPlugin extends CordovaPlugin {
 	
 	private CallbackContext mCordovaCallback;	
 
+	// Lifecycle methods never get called because Cordova is awesome.
 	@Override
 	public void onResume(boolean multitasking) {
 		initReader();
@@ -54,7 +55,13 @@ public class UniPayPlugin extends CordovaPlugin {
 	}
 	
 	@Override
-	public boolean execute(String action, JSONArray args, CallbackContext callback) throws JSONException {		
+	public boolean execute(String action, JSONArray args, CallbackContext callback) throws JSONException {
+		// Hack to work around lifecycle methods not being called.
+		// Not sure what we're going to do about cleanup.
+		if(mReader == null) {
+			initReader();
+		}
+		
 		if(ACTION_ENABLE_READER.equals(action)) {
 			mCordovaCallback = callback;
 			mReader.sendCommandEnableSwipingMSRCard();

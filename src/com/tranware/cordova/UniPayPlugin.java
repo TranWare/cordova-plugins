@@ -249,5 +249,26 @@ public class UniPayPlugin extends CordovaPlugin {
 				mCordovaCallback = null;				
 			}
 		}
+
+		@Override
+		public void onReceiveMsgToConnect() {
+			Log.d("TAG", "onReceiveMsgToConnect()");
+		}
+
+		@Override
+		public void onReceiveMsgConnected() {
+			Log.d("TAG", "onReceiveMsgFailureInfo()");
+		}
+
+		@Override
+		public void onReceiveMsgDisconnected() {
+			Log.d("TAG", "onReceiveMsgConnected()");
+		}
+
+		@Override
+		public void onReceiveMsgFailureInfo(int failure, String message) {
+			Log.d("TAG", "onReceiveMsgFailureInfo(" + failure + ", \"" + message + "\")");
+		}		
+		
 	}	
 }

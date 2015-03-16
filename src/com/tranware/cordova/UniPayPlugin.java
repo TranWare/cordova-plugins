@@ -25,11 +25,11 @@ public class UniPayPlugin extends CordovaPlugin {
 	
 	private UniPayReader mReader;	
 	private BroadcastReceiver mHeadsetReceiver;
-	private CallbackContext mCordovaCallback;
 	// written in main thread, read in Cordova thread
 	private volatile boolean mHeadsetPlugged;
 	// written in UniPay callback, read in Cordova thread
 	private volatile boolean mDetected;
+	private CallbackContext mCordovaCallback;
 
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -64,14 +64,14 @@ public class UniPayPlugin extends CordovaPlugin {
 	
 	@Override
 	public boolean execute(String action, JSONArray unused, CallbackContext callback) throws JSONException {
-
+		mCordovaCallback = callback;
+		
 		if(ACTION_DETECT_READER.equals(action)) {
 			if(mDetected) {
 				callback.success(RESULT_DETECTED);
 			}
 			else if(mHeadsetPlugged) {
 				// this should result in callback to onReceiveMsgConnected or onReceiveMsgTimeout
-				mCordovaCallback = callback;
 				mReader.registerListen();
 			}
 			else {
@@ -115,6 +115,7 @@ public class UniPayPlugin extends CordovaPlugin {
 		@Override
 		public void onReceiveMsgDisconnected() {
 			Log.d(TAG, "audio device unplugged");
+			mReader.unregisterListen();
 			mDetected = false;
 		}
 

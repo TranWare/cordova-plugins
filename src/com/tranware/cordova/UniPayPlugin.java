@@ -41,6 +41,7 @@ public class UniPayPlugin extends CordovaPlugin {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if(Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())) {
+					Log.d(TAG, "mHeadsetReceiver: ACTION_HEADSET_PLUG");
 					if(intent.getIntExtra("state", 0) == 1) {
 						// definitely not a UniPay if there's no mic
 						mHeadsetPlugged = intent.getIntExtra("microphone", 0) == 1;
@@ -48,6 +49,7 @@ public class UniPayPlugin extends CordovaPlugin {
 					else {
 						mHeadsetPlugged = false;
 					}
+					Log.d(TAG, "mHeadsetPlugged = " + mHeadsetPlugged);
 				}
 			}			
 		};
@@ -95,27 +97,29 @@ public class UniPayPlugin extends CordovaPlugin {
 		
 		@Override
 		public void onReceiveMsgTimeout(String message) {
-			Log.d(TAG, "no response from reader");
+			Log.d(TAG, "onReceiveMsgTimeout(\"" + message + "\")");
 			mReader.unregisterListen();
+			mReader.release();
 			mCordovaCallback.error(RESULT_NOT_DETECTED);
 		}
 
 		@Override
 		public void onReceiveMsgConnected() {
-			Log.d(TAG, "card reader detected");
+			Log.d(TAG, "onReceiveMsgConnected()");
 			mDetected = true;
 			mCordovaCallback.success(RESULT_DETECTED);
 		}
 		
 		@Override
 		public void onReceiveMsgToConnect() {
-			Log.d(TAG, "audio device plugged");
+			Log.d(TAG, "onReceiveMsgToConnect()");
 		}
 
 		@Override
 		public void onReceiveMsgDisconnected() {
-			Log.d(TAG, "audio device unplugged");
+			Log.d(TAG, "onReceiveMsgDisconnected()");
 			mReader.unregisterListen();
+			mReader.release();
 			mDetected = false;
 		}
 

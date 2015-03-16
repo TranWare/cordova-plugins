@@ -21,7 +21,7 @@ public class UniPayPlugin extends CordovaPlugin {
 	
 	private static final String ACTION_DETECT_READER = "ACTION_DETECT_READER";
 	private static final String RESULT_DETECTED = "RESULT_DETECTED";
-	private static final String RESULT_NOT_DETECTED = "RESULT_NOT_DETECTED";
+	private static final String ERROR_NOT_DETECTED = "ERROR_NOT_DETECTED";
 	
 	private UniPayReader mReader;	
 	private BroadcastReceiver mHeadsetReceiver;
@@ -67,13 +67,13 @@ public class UniPayPlugin extends CordovaPlugin {
 		
 		if(ACTION_DETECT_READER.equals(action)) {
 			if(mDetected) {
-				callback.success(RESULT_DETECTED);
+				success(RESULT_DETECTED);
 			}
 			else if(mHeadsetPlugged) {
 				initReader();
 			}
 			else {
-				callback.error(RESULT_NOT_DETECTED);
+				error(ERROR_NOT_DETECTED);
 			}			
 			return true;
 		}
@@ -95,14 +95,14 @@ public class UniPayPlugin extends CordovaPlugin {
 		public void onReceiveMsgTimeout(String message) {
 			Log.d(TAG, "onReceiveMsgTimeout(\"" + message + "\")");
 			destroyReader();
-			mCordovaCallback.error(RESULT_NOT_DETECTED);
+			error(ERROR_NOT_DETECTED);
 		}
 
 		@Override
 		public void onReceiveMsgConnected() {
 			Log.d(TAG, "onReceiveMsgConnected()");
 			mDetected = true;
-			mCordovaCallback.success(RESULT_DETECTED);
+			success(RESULT_DETECTED);
 		}
 		
 		@Override
@@ -114,6 +114,15 @@ public class UniPayPlugin extends CordovaPlugin {
 		public void onReceiveMsgDisconnected() {
 			Log.d(TAG, "onReceiveMsgDisconnected()");
 			destroyReader();
+			
+			/* This ensures that Cordova gets a callback if some action is
+			 * interrupted by the device being unplugged.  This comes into
+			 * play if the app tries to handshake with headphones and the user
+			 * unplugs them to save their ears.  Probably also if the user
+			 * unplugs the reader during a swipe attempt.
+			 */
+			error(ERROR_NOT_DETECTED);
+			
 			mDetected = false;
 		}
 
@@ -156,6 +165,20 @@ public class UniPayPlugin extends CordovaPlugin {
 			mReader.unregisterListen();
 			mReader.release();
 			mReader = null;
+		}
+	}
+	
+	private void success(String message) {
+		if(mCordovaCallback != null) {
+			mCordovaCallback.success(message);
+			mCordovaCallback = null;
+		}
+	}
+	
+	private void error(String message) {
+		if(mCordovaCallback != null) {
+			mCordovaCallback.error(message);
+			mCordovaCallback = null;
 		}
 	}
 	

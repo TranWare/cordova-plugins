@@ -33,7 +33,6 @@ public class UniPayPlugin extends CordovaPlugin {
 	private static final String ERROR_NOT_DETECTED = "ERROR_NOT_DETECTED";
 	
 	private static final String ACTION_GET_SWIPE = "ACTION_GET_SWIPE";
-	private static final String RESULT_SWIPE_NOW = "RESULT_SWIPE_NOW";
 	private static final String ERROR_TIMEOUT = "ERROR_TIMEOUT";
 	private static final String ERROR_NO_TRACK_2 = "ERROR_NO_TRACK_2";
 	private static final String ERROR_UNKNOWN = "ERROR_UNKNOWN";
@@ -200,12 +199,11 @@ public class UniPayPlugin extends CordovaPlugin {
 
 		@Override
 		public void onReceiveMsgToSwipeCard() {
-			// just want to see when this is called
+			/* If we call back for this, we won't be able to call back with
+			 * the card data.  Cordova complains about the callback being
+			 * reused.
+			 */
 			Log.d(TAG, "onReceiveMsgToSwipeCard()");
-			// i don't think we can call back for this *and* when the swipe is
-			// received; cordova complains about the callback being reused.
-			// remove this line if it prevents the card data callback.
-			mCordovaCallback.success(RESULT_SWIPE_NOW);
 		}		
 
 	}

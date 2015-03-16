@@ -34,8 +34,6 @@ public class UniPayPlugin extends CordovaPlugin {
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
 		super.initialize(cordova, webView);
-		mReader = new UniPayReader(new ReaderCallback(), cordova.getActivity());
-		configReader();
 		
 		mHeadsetReceiver = new BroadcastReceiver() {
 			@Override
@@ -60,8 +58,7 @@ public class UniPayPlugin extends CordovaPlugin {
 	@Override
 	public void onDestroy() {
 		cordova.getActivity().unregisterReceiver(mHeadsetReceiver);
-		mReader.unregisterListen();
-		mReader.release();
+		destroyReader();
 	}
 	
 	@Override
@@ -73,8 +70,7 @@ public class UniPayPlugin extends CordovaPlugin {
 				callback.success(RESULT_DETECTED);
 			}
 			else if(mHeadsetPlugged) {
-				// this should result in callback to onReceiveMsgConnected or onReceiveMsgTimeout
-				mReader.registerListen();
+				initReader();
 			}
 			else {
 				callback.error(RESULT_NOT_DETECTED);
@@ -98,7 +94,7 @@ public class UniPayPlugin extends CordovaPlugin {
 		@Override
 		public void onReceiveMsgTimeout(String message) {
 			Log.d(TAG, "onReceiveMsgTimeout(\"" + message + "\")");
-			mReader.unregisterListen();
+			destroyReader();
 			mCordovaCallback.error(RESULT_NOT_DETECTED);
 		}
 
@@ -117,13 +113,16 @@ public class UniPayPlugin extends CordovaPlugin {
 		@Override
 		public void onReceiveMsgDisconnected() {
 			Log.d(TAG, "onReceiveMsgDisconnected()");
-			mReader.unregisterListen();
+			destroyReader();
 			mDetected = false;
 		}
 
 	}
 	
-	private void configReader() {
+	private void initReader() {
+		destroyReader();
+		mReader = new UniPayReader(new ReaderCallback(), cordova.getActivity());
+
 		StructConfigParameters config = new StructConfigParameters();
 		config.setDirectionOutputWave((short) 1);
 		config.setFrequenceInput(48000);
@@ -145,8 +144,19 @@ public class UniPayPlugin extends CordovaPlugin {
 		config.setShuttleChannel((byte) 48);
 		config.setForceHeadsetPlug((short) 0);	        	
 		config.setUseVoiceRecognition((short) 1);	        	
-		config.setVolumeLevelAdjust((short) 0);
+		config.setVolumeLevelAdjust((short) 0);	
+		
 		mReader.connectWithProfile(config);
+		// this should result in callback to onReceiveMsgConnected or onReceiveMsgTimeout
+		mReader.registerListen();
+	}
+	
+	private void destroyReader() {
+		if(mReader != null) {
+			mReader.unregisterListen();
+			mReader.release();
+			mReader = null;
+		}
 	}
 	
 }

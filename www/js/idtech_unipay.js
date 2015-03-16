@@ -3,37 +3,31 @@
     var IDTech = ( typeof IDTech === 'undefined' ? {} : IDTech );
     var cordova = window.cordova || window.Cordova;
     
-    IDTech.enable = function(callback, error) {
+    IDTech.detectReader = function(callback, error) {
         var success = function(data) {
         	console.log(data)
         	callback(data);
         };
         var fail_handler =  error;
-        cordova.exec(success, fail_handler, 'com.tranware.UniPay', 'enableReader', []);
+        cordova.exec(success, fail_handler, 'com.tranware.UniPay', 'ACTION_DETECT_READER', []);
     };
-    IDTech.collect = function(callback, error) {
+    
+    IDTech.getSwipe = function(callback, error) {
         var success = function(data) {
         	console.log(data)
         	callback(data);
         };
         var fail_handler =  error;
-        cordova.exec(success, fail_handler, 'com.tranware.UniPay', 'getSwipe', []);
+        cordova.exec(success, fail_handler, 'com.tranware.UniPay', 'ACTION_GET_SWIPE', []);
     };
-    IDTech.cancel = function(callback, error) {
+    
+    IDTech.cancelSwipe = function(callback, error) {
         var success = function(data) {
         	console.log(data)
         	callback(data);
         };
         var fail_handler =  error;
-        cordova.exec(success, fail_handler, 'com.tranware.UniPay', 'cancelSwipe', []);
-    };
-    IDTech.disable = function(callback, error) {
-        var success = function(data) {
-        	console.log(data)
-        	callback(data);
-        };
-        var fail_handler =  error;
-        cordova.exec(success, fail_handler, 'com.tranware.UniPay', 'disableReader', []);
+        cordova.exec(success, fail_handler, 'com.tranware.UniPay', 'ACTION_CANCEL_SWIPE', []);
     };
 
     module.exports = IDTech;

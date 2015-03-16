@@ -29,7 +29,8 @@ public class UniPayPlugin extends CordovaPlugin {
 	private volatile boolean mHeadsetPlugged;
 	// written in UniPay callback, read in Cordova thread
 	private volatile boolean mDetected;
-	private CallbackContext mCordovaCallback;
+	// written in Cordova thread, read in UniPay callback
+	private volatile CallbackContext mCordovaCallback;
 
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {

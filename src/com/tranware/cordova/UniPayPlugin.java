@@ -99,7 +99,6 @@ public class UniPayPlugin extends CordovaPlugin {
 		public void onReceiveMsgTimeout(String message) {
 			Log.d(TAG, "onReceiveMsgTimeout(\"" + message + "\")");
 			mReader.unregisterListen();
-			mReader.release();
 			mCordovaCallback.error(RESULT_NOT_DETECTED);
 		}
 
@@ -119,7 +118,6 @@ public class UniPayPlugin extends CordovaPlugin {
 		public void onReceiveMsgDisconnected() {
 			Log.d(TAG, "onReceiveMsgDisconnected()");
 			mReader.unregisterListen();
-			mReader.release();
 			mDetected = false;
 		}
 

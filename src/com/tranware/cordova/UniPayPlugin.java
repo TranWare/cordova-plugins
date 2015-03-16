@@ -122,7 +122,6 @@ public class UniPayPlugin extends CordovaPlugin {
 			 * handshaking fails.
 			 */
 			Log.d(TAG, "onReceiveMsgTimeout(\"" + message + "\")");
-			destroyReader();
 			error(ERROR_NOT_DETECTED);
 		}
 
@@ -148,7 +147,6 @@ public class UniPayPlugin extends CordovaPlugin {
 			 * user unplugs the reader during a swipe attempt.
 			 */
 			error(ERROR_NOT_DETECTED);
-			destroyReader();			
 			mDetected = false;
 		}
 		
@@ -207,6 +205,14 @@ public class UniPayPlugin extends CordovaPlugin {
 				error(ERROR_TIMEOUT);
 			}
 		}
+
+		@Override
+		public void onReceiveMsgToSwipeCard() {
+			// just want to see when this is called
+			Log.d(TAG, "onReceiveMsgToSwipeCard()");
+			// i don't think we can call back for this *and* when the swipe is
+			// received; cordova complains about the callback being reused.
+		}		
 
 	}
 	
@@ -328,6 +334,10 @@ public class UniPayPlugin extends CordovaPlugin {
 		}
 	}
 	
+	/**
+	 * Delivers an error callback.  Has the side effect of destroying the
+	 * reader.
+	 */
 	private void error(String message) {
 		if(mCordovaCallback != null) {
 			mCordovaCallback.error(message);
@@ -337,6 +347,7 @@ public class UniPayPlugin extends CordovaPlugin {
 			// shouldn't happen, but we'd like to know if it does
 			Log.w(TAG, "error not delivered - callback was null");
 		}
+		destroyReader();
 	}
 	
 }

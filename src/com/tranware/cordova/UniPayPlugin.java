@@ -19,7 +19,7 @@ import com.idtechproducts.unipay.UniPayReader;
 public class UniPayPlugin extends CordovaPlugin {
 	private static final String TAG = UniPayPlugin.class.getSimpleName();
 	
-	private static final String ACTION_DETECT = "ACTION_DETECT";
+	private static final String ACTION_DETECT_READER = "ACTION_DETECT_READER";
 	private static final String RESULT_DETECTED = "RESULT_DETECTED";
 	private static final String RESULT_NOT_DETECTED = "RESULT_NOT_DETECTED";
 	
@@ -65,12 +65,12 @@ public class UniPayPlugin extends CordovaPlugin {
 	@Override
 	public boolean execute(String action, JSONArray unused, CallbackContext callback) throws JSONException {
 
-		if(ACTION_DETECT.equals(action)) {
+		if(ACTION_DETECT_READER.equals(action)) {
 			if(mDetected) {
 				callback.success(RESULT_DETECTED);
 			}
 			else if(mHeadsetPlugged) {
-				// this should result in callback to onReceiveMsgToConnect or onReceiveMsgTimeout
+				// this should result in callback to onReceiveMsgConnected or onReceiveMsgTimeout
 				mCordovaCallback = callback;
 				mReader.registerListen();
 			}
@@ -96,6 +96,7 @@ public class UniPayPlugin extends CordovaPlugin {
 		@Override
 		public void onReceiveMsgTimeout(String message) {
 			Log.d(TAG, "no response from reader");
+			mReader.unregisterListen();
 			mCordovaCallback.error(RESULT_NOT_DETECTED);
 		}
 

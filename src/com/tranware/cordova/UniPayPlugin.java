@@ -147,7 +147,6 @@ public class UniPayPlugin extends CordovaPlugin {
 			 * user unplugs the reader during a swipe attempt.
 			 */
 			error(ERROR_NOT_DETECTED);
-			mDetected = false;
 		}
 		
 		@Override
@@ -301,6 +300,7 @@ public class UniPayPlugin extends CordovaPlugin {
 			 */
 			mReader.release();
 			mReader = null;
+			mDetected = false;
 		}
 	}
 	

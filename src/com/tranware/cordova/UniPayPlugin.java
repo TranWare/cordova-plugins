@@ -33,6 +33,7 @@ public class UniPayPlugin extends CordovaPlugin {
 	private static final String ERROR_NOT_DETECTED = "ERROR_NOT_DETECTED";
 	
 	private static final String ACTION_GET_SWIPE = "ACTION_GET_SWIPE";
+	private static final String RESULT_SWIPE_NOW = "RESULT_SWIPE_NOW";
 	private static final String ERROR_TIMEOUT = "ERROR_TIMEOUT";
 	private static final String ERROR_NO_TRACK_2 = "ERROR_NO_TRACK_2";
 	private static final String ERROR_UNKNOWN = "ERROR_UNKNOWN";
@@ -185,16 +186,7 @@ public class UniPayPlugin extends CordovaPlugin {
 				final String trackData = new String(data);				
 				Track2Matcher matcher = new Track2Matcher();
 				if(matcher.find(trackData)) {
-					JSONObject result = new JSONObject();
-					try {
-						result.put("card", matcher.getCard());
-						result.put("exp", matcher.getExpMMYY());
-						result.put("raw", trackData);
-						success(result);
-					} catch (JSONException e) {
-						Log.w(TAG, "\"impossible\" exception", e);
-						error(ERROR_UNKNOWN);
-					}
+					success(matcher.getCard(), matcher.getExpMMYY(), trackData);
 				}
 				else {
 					error(ERROR_NO_TRACK_2);
@@ -212,6 +204,8 @@ public class UniPayPlugin extends CordovaPlugin {
 			Log.d(TAG, "onReceiveMsgToSwipeCard()");
 			// i don't think we can call back for this *and* when the swipe is
 			// received; cordova complains about the callback being reused.
+			// remove this line if it prevents the card data callback.
+			mCordovaCallback.success(RESULT_SWIPE_NOW);
 		}		
 
 	}
@@ -312,6 +306,11 @@ public class UniPayPlugin extends CordovaPlugin {
 		}
 	}
 	
+	/**
+	 * Delivers a success callback.  Does not destroy the reader.
+	 * 
+	 * @param message the success message
+	 */
 	private void success(String message) {
 		if(mCordovaCallback != null) {
 			mCordovaCallback.success(message);
@@ -323,20 +322,40 @@ public class UniPayPlugin extends CordovaPlugin {
 		}
 	}
 	
-	private void success(JSONObject result) {
+	/**
+	 * Delivers a card data callback.  Has the side effect of destroying the
+	 * reader.
+	 * 
+	 * @param card the card number
+	 * @param exp the expiration date in MMYY format
+	 * @param trackData the raw track data
+	 */
+	private void success(final String card, final String exp, final String trackData) {
 		if(mCordovaCallback != null) {
-			mCordovaCallback.success(result);
+			JSONObject cardData = new JSONObject();
+			try {
+				cardData.put("card", card);
+				cardData.put("exp", exp);
+				cardData.put("raw", trackData);
+				mCordovaCallback.success(cardData);
+			} catch (JSONException e) {
+				Log.w(TAG, "\"impossible\" exception", e);
+				mCordovaCallback.error(ERROR_UNKNOWN);
+			}
 			mCordovaCallback = null;
 		}
 		else {
 			// shouldn't happen, but we'd like to know if it does
 			Log.w(TAG, "success not delivered - callback was null");
 		}
+		destroyReader();
 	}
 	
 	/**
 	 * Delivers an error callback.  Has the side effect of destroying the
 	 * reader.
+	 * 
+	 * @param message the error message
 	 */
 	private void error(String message) {
 		if(mCordovaCallback != null) {

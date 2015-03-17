@@ -18,10 +18,9 @@ import com.idtechproducts.unipay.StructConfigParameters;
 import com.idtechproducts.unipay.UniPayReader;
 
 /**
- * Cordova plugin wrapper for the UniPay SDK.  Attempts to work around the
- * SDK's triple whammy of poor design, incomplete and sometimes incorrect
- * documentation, and numerous bugs.  Some of the bugs are worked around in
- * such a way that if they're ever fixed, this wrapper will stop working.
+ * Cordova plugin wrapper for the UniPay SDK.  Works around the SDK's triple
+ * whammy of poor design, incomplete and frequently incorrect documentation,
+ * and numerous bugs.
  *
  * @author Kevin Krumwiede
  */
@@ -105,9 +104,6 @@ public class UniPayPlugin extends CordovaPlugin {
 			return true;
 		}
 		else if(ACTION_CANCEL_SWIPE.equals(action)) {
-			/* Docs are vague about whether we should use stopSwipeCard,
-			 * sendCommandCancelSwipingMSRCard, or both.  
-			 */
 			if(mDetected) {
 				/* Now we have two callbacks - one from the swipe attempt and
 				 * one from the cancel.  Deliver an error to the original one,
@@ -117,9 +113,17 @@ public class UniPayPlugin extends CordovaPlugin {
 				mCordovaCallback.error(ERROR_CANCEL);
 				mCordovaCallback = callback;				
 				
-				/* stopSwipeCard always throws a NPE on my test device.
+				/* Docs are vague about whether we should use stopSwipeCard,
+				 * sendCommandCancelSwipingMSRCard, or both.  The demo app
+				 * sometimes calls both and sometimes only stopSwipeCard.
+				 * In my tests, stopSwipeCard often throws a NPE.
 				 */
-				//mReader.stopSwipeCard();
+				try {
+					mReader.stopSwipeCard();
+				}
+				catch(NullPointerException e) {
+					Log.w("Uncaught exception from UniPay SDK", e);
+				}
 				mReader.sendCommandCancelSwipingMSRCard();
 			}
 			return true;

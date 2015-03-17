@@ -37,6 +37,9 @@ public class UniPayPlugin extends CordovaPlugin {
 	private static final String ERROR_NO_TRACK_2 = "ERROR_NO_TRACK_2";
 	private static final String ERROR_UNKNOWN = "ERROR_UNKNOWN";
 	
+	private static final String ACTION_CANCEL_SWIPE = "ACTION_CANCEL_SWIPE";
+	private static final String ERROR_CANCEL = "ERROR_CANCEL";
+	
 	
 	private UniPayReader mReader;	
 	private BroadcastReceiver mHeadsetReceiver;
@@ -102,6 +105,20 @@ public class UniPayPlugin extends CordovaPlugin {
 			}
 			return true;
 		}
+		else if(ACTION_CANCEL_SWIPE.equals(action)) {
+			/* Not sure if we should use stopSwipeCard,
+			 * sendCommandCancelSwipingMSRCard, or both.
+			 */
+			
+			/* Now we have two callbacks - the one from the swipe attempt and
+			 * the one from the cancel.  Which one to call?  (Might need to
+			 * not overwrite the old one at the top of this method.)
+			 */
+			mReader.stopSwipeCard();
+			mReader.sendCommandCancelSwipingMSRCard();
+			error(ERROR_CANCEL);
+		}
+
 		
 		return false;
 	}
@@ -296,9 +313,15 @@ public class UniPayPlugin extends CordovaPlugin {
 			 * doing so causes it to never recognize when it is connected
 			 * again.  The demo app never calls this.  Calling it here ensures
 			 * that the record thread is stopped.  Calling it when the record
-			 * thread is not running seems to have no ill effect.
+			 * thread is not running usually has no ill effect, but sometimes
+			 * it throws a NPE originating in UniMagManager#task_stop.
 			 */
-			mReader.release();
+			try {
+				mReader.release();
+			}
+			catch(NullPointerException e) {
+				Log.w("Uncaught exception from UniPay SDK", e);
+			}
 			mReader = null;
 			mDetected = false;
 		}

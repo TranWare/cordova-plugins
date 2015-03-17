@@ -122,9 +122,11 @@ public class UniPayPlugin extends CordovaPlugin {
 				//mReader.stopSwipeCard();
 				mReader.sendCommandCancelSwipingMSRCard();
 			}
+			return true;
 		}
-		
-		return false;
+		else {
+			return false;
+		}
 	}
 
 	private class ReaderCallback extends UniPayReaderMsgAdapter {

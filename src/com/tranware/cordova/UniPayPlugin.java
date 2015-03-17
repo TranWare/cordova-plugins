@@ -40,7 +40,6 @@ public class UniPayPlugin extends CordovaPlugin {
 	private static final String ACTION_CANCEL_SWIPE = "ACTION_CANCEL_SWIPE";
 	private static final String ERROR_CANCEL = "ERROR_CANCEL";
 	
-	
 	private UniPayReader mReader;	
 	private BroadcastReceiver mHeadsetReceiver;
 	// written in main thread, read in Cordova thread
@@ -82,9 +81,8 @@ public class UniPayPlugin extends CordovaPlugin {
 	
 	@Override
 	public boolean execute(String action, JSONArray unused, CallbackContext callback) throws JSONException {
-		mCordovaCallback = callback;
-		
 		if(ACTION_DETECT_READER.equals(action)) {
+			mCordovaCallback = callback;
 			if(mDetected) {
 				success(RESULT_DETECTED);
 			}
@@ -97,6 +95,7 @@ public class UniPayPlugin extends CordovaPlugin {
 			return true;
 		}
 		else if(ACTION_GET_SWIPE.equals(action)) {
+			mCordovaCallback = callback;
 			if(mDetected) {
 				mReader.sendCommandEnableSwipingMSRCard();
 			}
@@ -106,19 +105,24 @@ public class UniPayPlugin extends CordovaPlugin {
 			return true;
 		}
 		else if(ACTION_CANCEL_SWIPE.equals(action)) {
-			/* Not sure if we should use stopSwipeCard,
-			 * sendCommandCancelSwipingMSRCard, or both.
+			/* Docs are vague about whether we should use stopSwipeCard,
+			 * sendCommandCancelSwipingMSRCard, or both.  
 			 */
-			
-			/* Now we have two callbacks - the one from the swipe attempt and
-			 * the one from the cancel.  Which one to call?  (Might need to
-			 * not overwrite the old one at the top of this method.)
-			 */
-			mReader.stopSwipeCard();
-			mReader.sendCommandCancelSwipingMSRCard();
-			error(ERROR_CANCEL);
+			if(mDetected) {
+				/* Now we have two callbacks - one from the swipe attempt and
+				 * one from the cancel.  Deliver an error to the original one,
+				 * and let the cancel callback deliver success to the new one.
+				 * Bypass our error method to avoid destroying the reader.
+				 */
+				mCordovaCallback.error(ERROR_CANCEL);
+				mCordovaCallback = callback;				
+				
+				/* stopSwipeCard always throws a NPE on my test device.
+				 */
+				//mReader.stopSwipeCard();
+				mReader.sendCommandCancelSwipingMSRCard();
+			}
 		}
-
 		
 		return false;
 	}
@@ -187,7 +191,7 @@ public class UniPayPlugin extends CordovaPlugin {
 				}
 			}
 			else if(command == cmdCancelSwipingMSRCard) {
-				// not unexpected
+				error(ERROR_CANCEL);
 			}
 			else {
 				Log.w(TAG, "unexpected command result: " + command);
@@ -311,10 +315,10 @@ public class UniPayPlugin extends CordovaPlugin {
 			mReader.unregisterListen();
 			/* The docs say to call this when the reader is disconnected, but
 			 * doing so causes it to never recognize when it is connected
-			 * again.  The demo app never calls this.  Calling it here ensures
-			 * that the record thread is stopped.  Calling it when the record
-			 * thread is not running usually has no ill effect, but sometimes
-			 * it throws a NPE originating in UniMagManager#task_stop.
+			 * again.  Calling it here ensures that the record thread is
+			 * stopped.  Calling it when the record thread is not running
+			 * seems to have no ill effect.  Running or not, sometimes it
+			 * throws a NPE.
 			 */
 			try {
 				mReader.release();

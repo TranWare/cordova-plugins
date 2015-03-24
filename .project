@@ -3,6 +3,7 @@
 	<name>Cordova Plugins</name>
 	<comment></comment>
 	<projects>
+		<project>Cordova Android Framework</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

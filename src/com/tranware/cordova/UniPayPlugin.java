@@ -4,6 +4,8 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.PluginResult;
+import org.apache.cordova.PluginResult.Status;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +34,7 @@ public class UniPayPlugin extends CordovaPlugin {
 	private static final String ERROR_NOT_DETECTED = "ERROR_NOT_DETECTED";
 	
 	private static final String ACTION_GET_SWIPE = "ACTION_GET_SWIPE";
+	private static final String RESULT_SWIPE_NOW = "RESULT_SWIPE_NOW";
 	private static final String ERROR_TIMEOUT = "ERROR_TIMEOUT";
 	private static final String ERROR_NO_TRACK_2 = "ERROR_NO_TRACK_2";
 	private static final String ERROR_UNKNOWN = "ERROR_UNKNOWN";
@@ -225,11 +228,10 @@ public class UniPayPlugin extends CordovaPlugin {
 
 		@Override
 		public void onReceiveMsgToSwipeCard() {
-			/* If we call back for this, we won't be able to call back with
-			 * the card data.  Cordova complains about the callback being
-			 * reused.
-			 */
 			Log.d(TAG, "onReceiveMsgToSwipeCard()");
+			PluginResult result = new PluginResult(Status.OK, RESULT_SWIPE_NOW);
+			result.setKeepCallback(true);
+			mCordovaCallback.sendPluginResult(result);
 		}		
 
 	}
